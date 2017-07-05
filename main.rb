@@ -4,6 +4,38 @@ require 'curb'
 
 redis = Redis.new
 
+class WebDocument
+  attr_accessor :url
+
+  def initialize(url)
+    self.url = url
+  end
+
+  def canonical_links
+    @links ||=
+    tree.search('a[href]')
+      .map { |link| canonicalize(link['href']) }
+  end
+
+  private
+
+  def tree
+    @tree ||=
+    Nokogiri::HTML(response_body)
+  end
+
+  def response_body
+    @response_body ||=
+    Curl::Easy.perform(url) do |curl|
+      curl.follow_location = true
+    end.body_str
+  end
+
+  def canonicalize(relative_url)
+    URI.join(url, relative_url).to_s
+  end
+end
+
 class Crawler
   attr_accessor :redis
 
@@ -17,30 +49,15 @@ class Crawler
 
     while url = redis.spop('urls')
       sleep 1
-      document = Nokogiri::HTML(request(url))
-      links = document.search('a[href]').map { |url| url['href'] }
-      
       puts url
-      links.each { |link|
-        puts "    Found link: #{canonicalize(link, url)}"
-        redis.sadd('urls', canonicalize(link, url))
+
+      WebDocument.new(url).canonical_links.each { |link|
+        puts "    Found link: #{link}"
+        redis.sadd('urls', link)
       }
     end
-  end
-
-  private
-
-  def request(url)
-    Curl::Easy.perform(url) do |curl|
-      curl.follow_location = true
-    end.body_str
-  end
-
-  def canonicalize(url, base)
-    URI.join(base, url).to_s
   end
 end
 
 crawler = Crawler.new(redis)
 crawler.run
-
