@@ -17,8 +17,18 @@ class Crawler
 
       WebDocument.new(url).canonical_links.each { |link|
         puts "    Found link: #{link}"
-        redis.sadd('urls', link)
+        enqueue link unless already_crawled? link
       }
+
+      redis.sadd('crawled', url)
     end
+  end
+
+  def enqueue(url)
+    redis.sadd 'urls', url
+  end
+
+  def already_crawled?(url)
+    redis.sismember 'crawled', url
   end
 end
