@@ -22,7 +22,10 @@ class WebDocument
   def response_body
     @response_body ||=
     Curl::Easy.perform(url) do |curl|
-      curl.follow_location = true
+      curl.connect_timeout   = 10
+      curl.dns_cache_timeout = 10
+      curl.timeout           = 10
+      curl.follow_location   = true
     end.body_str
   rescue
     "<html></html>"
