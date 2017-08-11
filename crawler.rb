@@ -109,6 +109,7 @@ class NoopRule < Rule
 end
 
 RULES = [
+  BanApexDomain.new('amazon'),
   BanApexDomain.new('bbc'),
   BanApexDomain.new('facebook'),
   BanApexDomain.new('flickr'),
@@ -116,6 +117,7 @@ RULES = [
   BanApexDomain.new('google'),
   BanApexDomain.new('instagram'),
   BanApexDomain.new('linkedin'),
+  BanApexDomain.new('marketing'),
   BanApexDomain.new('microsoft'),
   BanApexDomain.new('pcmag'),
   BanApexDomain.new('pinterest'),
@@ -124,6 +126,8 @@ RULES = [
   BanApexDomain.new('t.co'),
   BanApexDomain.new('tumblr'),
   BanApexDomain.new('twitter'),
+  BanApexDomain.new('wikiquote'),
+  BanApexDomain.new('wiktionary'),
   BanApexDomain.new('yahoo'),
   BanApexDomain.new('youtube'),
   BanPathComponent.new(/^user/),
