@@ -24,6 +24,8 @@ class WebDocument
     Curl::Easy.perform(url) do |curl|
       curl.follow_location = true
     end.body_str
+  rescue
+    "<html></html>"
   end
 
   def canonicalize(relative_url)
