@@ -10,9 +10,9 @@ class Crawler
   def run
     count = redis.scard('urls')
     puts "There are #{count} urls to crawl..."
+    last_domain = nil
 
     while url = next_url
-      sleep 1
       puts url
 
       WebDocument.new(url).canonical_links
@@ -26,14 +26,17 @@ class Crawler
           domain = URI(link).host
           if domain
             if not redis.sismember('domains', domain)
+              puts "        Found domain: #{domain}"
               redis.sadd('domains', domain)
               redis.sadd('freshurls', link)
             end
-            puts "        Found domain: #{domain}"
           end
         }
 
       redis.sadd('crawled', url)
+
+      sleep 1 if last_domain == URI(url).host
+      last_domain = URI(url).host
     end
   end
 
