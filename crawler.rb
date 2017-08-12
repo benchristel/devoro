@@ -1,61 +1,43 @@
 require_relative './web_document.rb'
+require_relative './store.rb'
 
 class Crawler
-  attr_accessor :redis
+  attr_accessor :store
 
   def initialize(redis)
-    self.redis = redis
+    self.store = Store.new(redis)
   end
 
   def run
-    count = redis.scard('urls')
-    puts "There are #{count} urls to crawl..."
+    puts "There are #{store.count_uris} urls to crawl..."
     last_domain = nil
 
-    while url = next_url
+    while url = store.pop_uri
       puts url
 
-      WebDocument.new(url).canonical_links
+      page = WebDocument.new(url)
+      page.canonical_links
         .select { |link| interesting_link? link }
         .reject { |link| already_crawled? link }
-        .each   { |link|
-          enqueue link
-        }
-        .uniq { |link| URI(link).host }
-        .each { |link|
-          domain = URI(link).host
-          if domain
-            if not redis.sismember('domains', domain)
-              puts "        Found domain: #{domain}"
-              redis.sadd('domains', domain)
-              redis.sadd('freshurls', link)
-            end
-          end
-        }
+        .each   { |link| store.enqueue_uri link, 1 }
 
-      redis.sadd('crawled', url)
+      store.add_page page
 
       sleep 1 if last_domain == URI(url).host
       last_domain = URI(url).host
     end
+
+    puts "Finished eating the entire web!"
   end
 
   private
 
-  def next_url
-    redis.spop('freshurls') || redis.spop('urls')
-  end
-
-  def enqueue(url)
-    redis.sadd 'urls', url
-  end
-
-  def already_crawled?(url)
-    redis.sismember 'crawled', url
-  end
-
   def interesting_link?(link)
     LinkJudge.new(link).approve?
+  end
+
+  def already_crawled?(link)
+    store.crawled? link
   end
 end
 
