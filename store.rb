@@ -1,6 +1,7 @@
 class Store
   def initialize(redis)
     @redis = redis
+    @results = File.open('./pages.tsv', 'a')
   end
 
   def enqueue_uri(uri, referrer_rating)
@@ -16,17 +17,18 @@ class Store
   end
 
   def add_page(web_document)
-    @redis.sadd('crawled', web_document.url)
+    @redis.sadd 'crawled', web_document.url
+    @redis.zrem 'ranked_urls', web_document.url
+    @results.puts "#{web_document.rating}\t#{web_document.url}\t#{web_document.top_words.join(' ')}"
+    @results.flush
   end
 
   def crawled?(uri)
     @redis.sismember('crawled', uri)
   end
 
-  def pop_uri
-    first = @redis.zrevrange('ranked_urls', 0, 0)[0]
-    @redis.zrem 'ranked_urls', first
-    first
+  def top_uri
+    @redis.zrevrange('ranked_urls', 0, 0)[0]
   end
 
   def top(n)
