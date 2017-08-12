@@ -93,8 +93,28 @@ class BanPathComponent < Rule
     components(uri).any? { |c| c[@bad] }
   end
 
+  def name
+    "ban path #{@bad}"
+  end
+
+  private
+
   def components(uri)
     uri.path ? uri.path.split('/') : []
+  end
+end
+
+class BanNonHtml < Rule
+  def reject?(uri)
+    # reject if uri has an extension that is not .htm(l)
+    /\.[a-z]{3}[a-z](\?|$)/ =~ uri.to_s &&
+    /\.html?(\?|$)/ !~ uri.to_s &&
+    /\.aspx?(\?|$)/ !~ uri.to_s &&
+    /\.php(\?|$)/ !~ uri.to_s
+  end
+
+  def name
+    "non-html"
   end
 end
 
@@ -146,6 +166,7 @@ RULES = [
   BanPathComponent.new(/^tos$/),
   BanPathComponent.new('privacy'),
   BanPathComponent.new('copyright'),
+  BanNonHtml.new(),
 
   NoopRule.new()
 ]
