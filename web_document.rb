@@ -32,7 +32,9 @@ class WebDocument
   end
 
   def canonicalize(relative_url)
-    URI.join(url, relative_url).to_s
+    canonical = URI.join(url, relative_url)
+    canonical.fragment = nil # remove the "hashtag" at the end of the URI
+    canonical.to_s
   rescue
     ''
   end
