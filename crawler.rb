@@ -47,13 +47,23 @@ class LinkJudge
   end
 
   def approve?
-    RULES.none? { |rule| rule.reject? @uri }
+    RULES.each { |rule|
+      if rule.reject? @uri
+        STDERR.puts "Rule '#{rule.name}' rejected #{@uri}"
+        return false
+      end
+    }
+    true
   end
 end
 
 class Rule
   def reject?
     raise NotImplementedError.new 'Subclasses of Rule must implement reject?'
+  end
+
+  def name
+    'unnamed'
   end
 end
 
@@ -66,6 +76,10 @@ class BanApexDomain < Rule
   def reject?(uri)
     #TODO this is imprecise
     uri.host && uri.host[@domain]
+  end
+
+  def name
+    "ban domain #{@domain}"
   end
 end
 
@@ -108,7 +122,7 @@ RULES = [
   BanApexDomain.new('pinterest'),
   BanApexDomain.new('snapchat'),
   BanApexDomain.new('soundcloud'),
-  BanApexDomain.new('t.co'),
+  BanApexDomain.new(/^t.co$/),
   BanApexDomain.new('tumblr'),
   BanApexDomain.new('twitter'),
   BanApexDomain.new('wikiquote'),
@@ -128,9 +142,8 @@ RULES = [
   BanPathComponent.new(/^edit/),
   BanPathComponent.new(/^profile/),
   BanPathComponent.new(/^search/),
-  BanPathComponent.new(/^new/),
   BanPathComponent.new(/^login/),
-  BanPathComponent.new('tos'),
+  BanPathComponent.new(/^tos$/),
   BanPathComponent.new('privacy'),
   BanPathComponent.new('copyright'),
 
