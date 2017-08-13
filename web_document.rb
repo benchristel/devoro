@@ -35,6 +35,8 @@ class WebDocument
 
   def error?
     response.status.to_i > 399
+  rescue
+    true
   end
 
   def english?
