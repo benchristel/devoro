@@ -60,6 +60,23 @@ class BanNonHtml < Rule
   end
 end
 
+class BanNonHttp < Rule
+  def reject?(uri)
+    uri.scheme !~ /^http/
+  end
+end
+
+class BanUrl < Rule
+  # bad can be a string or regex
+  def initialize(bad)
+    @bad = bad
+  end
+
+  def reject?(uri)
+    uri.to_s[@bad]
+  end
+end
+
 class NoopRule < Rule
   def reject?(uri)
     false
@@ -68,26 +85,40 @@ end
 
 MOBILE_DOMAINS = /(\.|^)m(obile)?\./
 NON_ENGLISH_WIKIPEDIAS = /(?<!en)\.wikipedia\.org/
+GOVERNMENT_DOMAINS = /\.gov($|\.[a-z]{2})/
 
 RULES = [
+  BanNonHttp.new(),
+  BanUrl.new('yahoo.com/news'),
   BanApexDomain.new('amazon'),
+  BanApexDomain.new('answers.yahoo.com'),
   BanApexDomain.new('anuncioneon'),
   BanApexDomain.new('bbc'),
+  BanApexDomain.new('cbsnews'),
+  BanApexDomain.new('europeanbook.com'),
   BanApexDomain.new('facebook'),
+  BanApexDomain.new('finance.yahoo.com'),
   BanApexDomain.new('flickr'),
+  BanApexDomain.new(GOVERNMENT_DOMAINS),
   BanApexDomain.new('geocities.com'),
   BanApexDomain.new('goo.gl'),
   BanApexDomain.new('google'),
   BanApexDomain.new('instagram'),
+  BanApexDomain.new('justia.com'),
   BanApexDomain.new('linkedin'),
   BanApexDomain.new('marketing'),
   BanApexDomain.new('microsoft'),
+  BanApexDomain.new('newsweek.com'),
   BanApexDomain.new('pcmag'),
   BanApexDomain.new('pinterest'),
+  BanApexDomain.new('redbull'),
+  BanApexDomain.new('scribd.com'),
   BanApexDomain.new('snapchat'),
   BanApexDomain.new('soundcloud'),
+  BanApexDomain.new('sports.yahoo.com'),
   BanApexDomain.new('stackexchange'),
   BanApexDomain.new(/^t.co$/),
+  BanApexDomain.new('thenation.com'),
   BanApexDomain.new('tumblr'),
   BanApexDomain.new('twitter'),
   BanApexDomain.new('wikiquote'),
