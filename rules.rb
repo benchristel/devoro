@@ -132,6 +132,7 @@ RULES = [
   BanApexDomain.new(NON_ENGLISH_WIKIPEDIAS),
   BanApexDomain.new('youtube'),
   BanApexDomain.new(MOBILE_DOMAINS),
+  BanUrl.new(/zompist.com\/archive\/.*\.html$/),
   BanPathComponent.new(/^user/),
   BanPathComponent.new(/user$/),
   BanPathComponent.new(/^edit/),

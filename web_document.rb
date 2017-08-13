@@ -77,6 +77,10 @@ class WebDocument
       curl.timeout           = 10
       curl.follow_location   = true
     end
+  rescue Curl::Err::HostResolutionError => e
+    RULES << BanApexDomain.new(URI(url).host)
+    STDERR.puts "ERROR in response: #{e.class} : #{e}"
+    @response = NullResponse.new
   rescue => e
     STDERR.puts "ERROR in response: #{e.class} : #{e}"
     @response = NullResponse.new

@@ -24,7 +24,7 @@ class Crawler
       rating = page.rating
       puts "#{url}"
 
-      if page.english?
+      if page.rating > 14 && page.english?
         page.canonical_links
           .select { |link| interesting_link? link }
           .reject { |link| already_crawled? link or link == url }
