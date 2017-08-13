@@ -21,7 +21,8 @@ class WebDocument
   end
 
   def rating
-    (Set.new(top_words) - BORING_WORDS).count * length_score
+    return 0 if top_words.count == 0
+    ((Set.new(top_words) - BORING_WORDS).count * 20 / top_words.count).round
   end
 
   def words
@@ -86,15 +87,6 @@ class WebDocument
     canonical.to_s
   rescue
     ''
-  end
-
-  def length_score
-    1
-    # len = plaintext.length
-    # return 2 if len < 140
-    # return 3 if len < 700
-    # return 4 if len < 5000
-    # return 5
   end
 end
 
