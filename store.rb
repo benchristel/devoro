@@ -12,7 +12,11 @@ class Store
     if not @redis.sismember('domains', domain)
       puts "        Found domain: #{domain}"
       @redis.sadd('domains', domain)
-      increase_rating uri, referrer_rating
+      # boost the priority of newly-discovered domains
+      # referenced by high-quality pages
+      if referrer_rating > 18
+        increase_rating uri, referrer_rating
+      end
     end
   end
 
