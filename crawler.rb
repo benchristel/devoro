@@ -15,6 +15,11 @@ class Crawler
     last_domain = nil
 
     while url = store.top_uri
+      if not interesting_link?(url)
+        store.remove_uri url
+        next
+      end
+
       page = WebDocument.new(url)
       rating = page.rating
       puts "#{url}"
