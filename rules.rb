@@ -86,6 +86,7 @@ RULES = [
   BanApexDomain.new('pinterest'),
   BanApexDomain.new('snapchat'),
   BanApexDomain.new('soundcloud'),
+  BanApexDomain.new('stackexchange'),
   BanApexDomain.new(/^t.co$/),
   BanApexDomain.new('tumblr'),
   BanApexDomain.new('twitter'),
