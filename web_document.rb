@@ -52,7 +52,6 @@ class WebDocument
   def plaintext
     @plaintext ||= tree.xpath("//*[not(self::script or self::style)]/text()")
       .to_s
-      .encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
       .squeeze(" \n\t")
   rescue ArgumentError => e
     STDERR.puts "ERROR in plaintext: #{e.class} : #{e}"
@@ -65,7 +64,7 @@ class WebDocument
   end
 
   def response_body
-    response.body_str
+    response.body_str.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
   rescue => e
     STDERR.puts "ERROR in response_body: #{e.class} : #{e}"
     ""
