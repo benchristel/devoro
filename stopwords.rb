@@ -81,6 +81,14 @@ t
 couldn
 doesn
 wouldn
+comments
+website
+view
+world
+time
+post
+january february march april may june july
+august september october november december
 nbsp
 amp
 lt
