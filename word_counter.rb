@@ -1,5 +1,5 @@
 require 'pqueue'
-require './words'
+require './stopwords'
 
 class WordCounter
   def initialize(words)
@@ -15,13 +15,13 @@ class WordCounter
     top_words = PQueue.new() { |a, b| a[:rank] <=> b[:rank] }
 
     word_counts.each { |word, count|
-      next if WORDS.include? word
+      next if STOPWORDS.include? word
       top_words.push({
         word: word,
         rank: count
       })
     }
 
-    top_words.take(10).reject(&:nil?).map { |w| w[:word] }
+    top_words.take(n).reject(&:nil?).map { |w| w[:word] }
   end
 end

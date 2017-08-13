@@ -70,9 +70,11 @@ NON_ENGLISH_WIKIPEDIAS = /(?<!en)\.wikipedia\.org/
 
 RULES = [
   BanApexDomain.new('amazon'),
+  BanApexDomain.new('anuncioneon'),
   BanApexDomain.new('bbc'),
   BanApexDomain.new('facebook'),
   BanApexDomain.new('flickr'),
+  BanApexDomain.new('geocities.com'),
   BanApexDomain.new('goo.gl'),
   BanApexDomain.new('google'),
   BanApexDomain.new('instagram'),
@@ -95,12 +97,12 @@ RULES = [
   BanApexDomain.new('wikinews'),
   BanApexDomain.new('wikiversity'),
   BanApexDomain.new(NON_ENGLISH_WIKIPEDIAS),
-  BanApexDomain.new('yahoo'),
   BanApexDomain.new('youtube'),
   BanApexDomain.new(MOBILE_DOMAINS),
   BanPathComponent.new(/^user/),
   BanPathComponent.new(/user$/),
   BanPathComponent.new(/^edit/),
+  BanPathComponent.new(/^post-edit/), # blogger edit links
   BanPathComponent.new(/^profile/),
   BanPathComponent.new(/^search/),
   BanPathComponent.new(/^login/),

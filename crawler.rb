@@ -7,6 +7,7 @@ class Crawler
 
   def initialize(redis)
     self.store = Store.new(redis)
+    @link_file = File.open('./links.log', 'a')
   end
 
   def run
@@ -16,12 +17,18 @@ class Crawler
     while url = store.top_uri
       page = WebDocument.new(url)
       rating = page.rating
-      puts "#{rating}\t#{url}"
+      puts "#{url}"
 
-      page.canonical_links
-        .select { |link| interesting_link? link }
-        .reject { |link| already_crawled? link or link == url }
-        .each   { |link| store.enqueue_uri link, rating }
+      if page.english?
+        page.canonical_links
+          .select { |link| interesting_link? link }
+          .reject { |link| already_crawled? link or link == url }
+          .each   { |link|
+            @link_file.puts "#{url} -> #{link}"
+            @link_file.flush
+            store.enqueue_uri link, rating
+          }
+      end
 
       sleep 1 if last_domain == URI(url).host
 

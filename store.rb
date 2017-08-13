@@ -19,6 +19,7 @@ class Store
   def add_page(web_document)
     @redis.sadd 'crawled', web_document.url
     @redis.zrem 'ranked_urls', web_document.url
+    return if web_document.error? || !web_document.english?
     @results.puts "#{web_document.rating}\t#{web_document.url}\t#{web_document.top_words.join(' ')}"
     @results.flush
   end

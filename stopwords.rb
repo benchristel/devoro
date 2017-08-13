@@ -1,6 +1,6 @@
 require 'set'
 
-WORDS = Set.new %w(
+STOPWORDS = Set.new %w(
 a
 the
 be
@@ -83,8 +83,12 @@ doesn
 wouldn
 nbsp
 amp
+lt
+gt
 rsquo
 lsquo
+raquo
+laquo
 icirc
 iacute
 ecirc
@@ -94,7 +98,9 @@ acirc
 aring
 agrave
 ograve
+ocirc
 ucirc
 ntilde
 ecirc
+middot
 )

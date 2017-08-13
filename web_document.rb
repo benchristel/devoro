@@ -1,8 +1,10 @@
 require 'nokogiri'
 require 'curl'
 require './word_counter'
-require './words'
+require './stopwords'
+require './boring_words'
 require 'set'
+require 'whatlanguage'
 
 class WebDocument
   attr_accessor :url
@@ -19,17 +21,27 @@ class WebDocument
   end
 
   def rating
-    (70000 * personal_word_count.to_f /
-    plaintext_length * length_score)
-    .round
+    (Set.new(top_words) - BORING_WORDS).count * length_score
   end
 
   def words
-    plaintext.split(/[^a-zA-Z]+/).map(&:downcase)
+    plaintext.split(/[^a-zA-Z0-9]+/).map(&:downcase)
   end
 
   def top_words
-    WordCounter.new(words).top(10)
+    @top_words ||= WordCounter.new(words).top(20)
+  end
+
+  def error?
+    response.status.to_i > 399
+  end
+
+  def english?
+    language == :english
+  end
+
+  def language
+    @language ||= WhatLanguage.new(:all).language(plaintext)
   end
 
   private
@@ -50,16 +62,22 @@ class WebDocument
   end
 
   def response_body
-    @response_body ||=
-    Curl::Easy.perform(url) do |curl|
+    response.body_str
+  rescue => e
+    STDERR.puts "ERROR in response_body: #{e.class} : #{e}"
+    ""
+  end
+
+  def response
+    @response ||= Curl::Easy.perform(url) do |curl|
       curl.connect_timeout   = 10
       curl.dns_cache_timeout = 10
       curl.timeout           = 10
       curl.follow_location   = true
-    end.body_str
+    end
   rescue => e
-    STDERR.puts "ERROR in response_body: #{e.class} : #{e}"
-    "<html></html>"
+    STDERR.puts "ERROR in response: #{e.class} : #{e}"
+    @response = NullResponse.new
   end
 
   def canonicalize(relative_url)
@@ -70,20 +88,22 @@ class WebDocument
     ''
   end
 
-  def personal_word_count
-    @personal_word_count ||=
-      plaintext.scan(/\b(I|[Mm]y|me|mine)\b/).count + 1
-  end
-
-  def plaintext_length
-    plaintext.length + 1
-  end
-
   def length_score
-    len = plaintext.length
-    return 0 if len < 140
-    return 1 if len < 700
-    return 2 if len < 5000
-    return 3
+    1
+    # len = plaintext.length
+    # return 2 if len < 140
+    # return 3 if len < 700
+    # return 4 if len < 5000
+    # return 5
+  end
+end
+
+class NullResponse
+  def status
+    999
+  end
+
+  def body_str
+    ''
   end
 end
