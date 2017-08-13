@@ -25,7 +25,7 @@ class WebDocument
   end
 
   def words
-    plaintext.split(/[^a-zA-Z0-9]+/).map(&:downcase)
+    plaintext.split(/[^a-zA-Z]+/).map(&:downcase)
   end
 
   def top_words
